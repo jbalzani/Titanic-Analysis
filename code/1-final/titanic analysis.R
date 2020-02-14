@@ -17,6 +17,58 @@ titanic_clean <- titanic_train %>%
 
 #### above code from HarvardX staff
 #### some question wording from HarvardX staff
+##data visualization
+titanic <- titanic_train %>%
+  select(Survived, Pclass, Sex, Age, SibSp, Parch, Fare) %>%
+  mutate(Survived = factor(Survived),
+         Pclass = factor(Pclass),
+         Sex = factor(Sex))
+?titanic_train
+titanic %>% head()
+#generate density plot of age grouped by sex
+titanic %>% filter(!is.na(Age) & !is.na(Sex)) %>%
+  ggplot(aes(Age, y = ..count.., fill = Sex, color = Sex)) +
+  geom_density() +
+  facet_grid(. ~ Sex)
+
+#qq plot of passenger age  
+params <- titanic %>%
+  filter(!is.na(Age)) %>%
+  summarize(mean = mean(Age), sd = sd(Age))
+titanic %>% ggplot(aes(sample = Age)) +
+  geom_qq(dparams = params) +
+  geom_abline()
+
+#barplot of sex and survival
+titanic %>% ggplot(aes(Sex, fill = Survived)) +
+  geom_bar(position = position_dodge())
+
+#density plot of survival by age
+titanic %>% ggplot(aes(Age, y = ..count.., fill = Survived)) +
+  geom_density(alpha = 0.2)
+
+#survival by fare boxplot
+titanic %>% filter(Fare != 0) %>%
+  ggplot(aes(Survived, Fare)) +
+  geom_jitter(width = 0.1, alpha = 0.2) +
+  geom_boxplot() +
+  scale_y_continuous(trans = "log2")
+
+#survival by class
+titanic %>% ggplot(aes(Pclass, fill = Survived)) +
+  geom_bar()
+
+titanic %>% ggplot(aes(Pclass, fill = Survived)) +
+  geom_bar(position = position_fill())
+
+titanic %>% ggplot(aes(Survived, fill = Pclass)) +
+  geom_bar(position = position_fill())
+
+#survival by age, sex, and passenger class, density plots
+titanic %>% filter(!is.na(Age)) %>%
+  ggplot(aes(Age, y = ..count.., fill = Survived)) +
+  geom_density(alpha = 0.2) +
+  facet_grid(Sex ~ Pclass)
 
 #split titanic_clean into test and training sets
 #set seed to 42, then use caret package to create a 20% data partition based on 
